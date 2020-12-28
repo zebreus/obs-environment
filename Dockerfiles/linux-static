@@ -1,0 +1,25 @@
+FROM debian:buster AS build-stage
+
+RUN apt update && apt install -y build-essential git nano perl python libclang-dev clang  gperf bison flex freeglut3-dev cmake wget libmariadb-dev-compat
+
+RUN git clone --branch 5.15.2 git://code.qt.io/qt/qt5.git /qt5 && cd /qt5 && ./init-repository
+
+RUN mkdir /build && cd /build && \
+  /qt5/configure -prefix /qtbase -D QT_NO_BUILD_TESTS=ON -nomake examples -opensource -confirm-license \
+  -c++std c++11 \
+  -static \
+  -plugin-sql-mysql
+
+RUN cd /build && make -j 6 -l 80
+
+RUN cd /build && make install
+
+FROM debian:buster as final-stage
+
+RUN apt update && apt install -y build-essential libmariadb-dev
+
+COPY --from=build-stage /qtbase /qtbase
+
+WORKDIR /src
+
+ENV PATH="/qtbase/bin:${PATH}"
