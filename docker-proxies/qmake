@@ -1,0 +1,10 @@
+#!/bin/sh
+for var in "$@"
+do
+    if [[ $var == "-query" ]]
+    then
+        "$( cd "$( dirname "$(readlink -f $0)" )" && pwd )/qmake.old" -query
+        exit
+    fi
+done
+docker run --rm -v $(pwd):$(pwd) --workdir=$(pwd)  madmanfred/obs-environment qmake $@

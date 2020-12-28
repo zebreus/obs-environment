@@ -1,0 +1,2 @@
+#!/bin/sh
+docker run --rm -v $(pwd):$(pwd) --workdir=$(pwd)  madmanfred/obs-environment make $@

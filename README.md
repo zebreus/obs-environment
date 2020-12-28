@@ -19,3 +19,17 @@ To run qmake in the docker container:
 ```docker run --rm -it -v $(pwd):/src madmanfred/obs-environment make```
 
 The generated binary will be statically linked against the qt libraries, but you still need to supply the dynamic libraries for mariadb/mysql.
+
+## Integration into qtcreator
+To integrate the build environment with qtcreator run the `create-prefix.sh` and follow the instructions from there.
+
+If you want to do it manually follow these steps:
+
+- Copy /qtbase from the docker container to the host system
+- Rename the bin/qmake to bin/qmake.old
+- Move the proxy qmake (`docker-proxies/qmake`) to the location of the old qmake
+- options>kits>qt-versions Create a qt version with the new prefix
+- options>kits>kits Create a kit with the new qt version
+- Adjust the path environment variable of the new kit, to include a path to the proxy make (`docker-proxies/make`)
+- Select the new kit in your project
+- Disable shadow build in your project
