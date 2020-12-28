@@ -8,7 +8,8 @@ RUN mkdir /build && cd /build && \
   /qt5/configure -prefix /qtbase -D QT_NO_BUILD_TESTS=ON -nomake examples -opensource -confirm-license \
   -c++std c++11 \
   -static \
-  -plugin-sql-mysql
+  -plugin-sql-mysql \
+  -feature-relocatable
 
 RUN cd /build && make -j 6 -l 80
 
