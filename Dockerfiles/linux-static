@@ -4,23 +4,80 @@ RUN apt update && apt install -y build-essential git nano perl python libclang-d
 
 RUN git clone --branch 5.15.2 git://code.qt.io/qt/qt5.git /qt5 && cd /qt5 && ./init-repository
 
-RUN mkdir /build && cd /build && \
+RUN sed 's/main/main contrib non-free/g' /etc/apt/sources.list && apt update && apt install -y "^libxcb.*" libx11-xcb-dev libglu1-mesa-dev libxrender-dev
+
+RUN apt update && apt install -y libssl-dev libssl1.1 openssl
+
+RUN apt update && apt install -y libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev  libxkbcommon-dev libxkbcommon-x11-dev
+
+RUN apt update && apt install -y libdirectfb-dev libqt5opengl5-dev
+
+RUN apt update && apt install -y libgles2-mesa-dev
+
+#RUN mkdir -p /build && cd /build && \
+#  /qt5/configure -prefix /qtbase -D QT_NO_BUILD_TESTS=ON -nomake examples -opensource -confirm-license \
+#  --lolinvalid || true
+
+ENV QT_XKB_CONFIG_ROOT=/usr/share/X11/xkb
+
+#Note: When linking against OpenSSL, you can override the default
+#library names through OPENSSL_LIBS.
+#For example:
+#    OPENSSL_LIBS='-L/opt/ssl/lib -lssl -lcrypto' ./configure -openssl-linked
+ENV OPENSSL_LIBS='/usr/lib/x86_64-linux-gnu/libssl.a /usr/lib/x86_64-linux-gnu/libcrypto.a'
+
+RUN mkdir -p /build && cd /build && \
   /qt5/configure -prefix /qtbase -D QT_NO_BUILD_TESTS=ON -nomake examples -opensource -confirm-license \
   -c++std c++11 \
   -static \
   -plugin-sql-mysql \
-  -feature-relocatable
+  -feature-relocatable \
+  -qt-doubleconversion \
+  -qt-zlib \
+  -qt-pcre \
+  -qt-libpng \
+  -qt-libjpeg \
+  -ssl \
+  -openssl-linked \
+  -qt-freetype \
+  -qt-harfbuzz \
+  -qt-sqlite \
+  -qt-assimp \
+  -qt-tiff \
+  -qt-webp \
+  -skip webengine \
+  -xcb \
+  -directfb \
+  -xcb-xlib \
+  -bundled-xcb-xinput \
+  -egl \
+  -opengl es2 \
+  -eglfs
 
-RUN cd /build && make -j 6 -l 80
+# Invalid  
+#  -qt-xcb \
+#  -linuxfb \
+#  -libinput \
+#  -xkbcommon \
+
+# Webengine stuff
+#  -qt-webengine-icu
+#  -qt-webengine-ffmpeg
+#  -qt-webengine-opus
+#  -qt-webengine-webp
+
+RUN cd /build && make -j 1 -l 80
 
 RUN cd /build && make install
 
 FROM debian:buster as final-stage
 
 RUN apt update && apt install -y build-essential libmariadb-dev
+RUN apt update && apt install -y freeglut3-dev
 
 COPY --from=build-stage /qtbase /qtbase
 
 WORKDIR /src
 
 ENV PATH="/qtbase/bin:${PATH}"
+
