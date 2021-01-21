@@ -39,7 +39,7 @@ RUN mkdir -p /build && cd /build && \
   -qt-libjpeg \
   -ssl \
   -openssl-linked \
-  -qt-freetype \
+  -system-freetype \
   -qt-harfbuzz \
   -qt-sqlite \
   -qt-assimp \
@@ -52,7 +52,8 @@ RUN mkdir -p /build && cd /build && \
   -bundled-xcb-xinput \
   -egl \
   -opengl es2 \
-  -eglfs
+  -eglfs \
+  -fontconfig
 
 # Invalid  
 #  -qt-xcb \
