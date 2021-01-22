@@ -47,7 +47,6 @@ RUN mkdir -p /build && cd /build && \
   -qt-webp \
   -skip webengine \
   -xcb \
-  -directfb \
   -xcb-xlib \
   -bundled-xcb-xinput \
   -egl \
