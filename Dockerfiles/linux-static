@@ -51,7 +51,7 @@ RUN mkdir -p /build && cd /build && \
   -xcb-xlib \
   -bundled-xcb-xinput \
   -egl \
-  -opengl es2 \
+  -opengl desktop \
   -eglfs \
   -fontconfig
 
